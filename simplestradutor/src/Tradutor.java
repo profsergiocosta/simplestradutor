@@ -5,24 +5,23 @@ class Scanner {
     private int current; 
 
 
+    public Scanner (byte[] input) {
+        this.input = input;
+    }
+
+
     private char peek () {
         if (current < input.length)
            return (char)input[current];
        return 0;
     }
 
-    private void match (char c) {
-        if (c == peek()) {
-            current++;
-        } else {
-            throw new Error("syntax error");
-        }
-    }
 
     public char nextToken () {
         char ch = peek();
 
         if (Character.isDigit(ch)) {
+            current++;
             return ch;
         }
 
@@ -43,31 +42,32 @@ class Scanner {
 }
 
  class Parser {
-    private byte[] input;
-    private int current; 
+    
+    private Scanner scan;
+    private char currentToken;
 
-	public Parser (byte[] input) {
-        this.input = input;
+    public Parser(byte[] input) {
+        scan = new Scanner(input);
+        currentToken = scan.nextToken();
     }
+
+    private void nextToken () {
+        currentToken = scan.nextToken();
+    }
+
 
     public void parse () {
         expr();
     }
+ 
 
-
-    private char peek () {
-        if (current < input.length)
-           return (char)input[current];
-       return 0;
-    }
-
-    private void match (char c) {
-        if (c == peek()) {
-            current++;
-        } else {
+    private void match(char t) {
+        if (currentToken == t) {
+            nextToken();
+        }else {
             throw new Error("syntax error");
         }
-    }
+   }
 
 
     void expr() {
@@ -76,26 +76,26 @@ class Scanner {
      }
 
      void digit () {
-        if (Character.isDigit(peek())) {
-            System.out.println(peek());
-            match(peek());
+        if (Character.isDigit(currentToken)) {
+            System.out.println("push " + currentToken);
+            match(currentToken);
         } else {
            throw new Error("syntax error");
         }
     }
 
     void oper () {
-        if (peek() == '+') {
+        if (currentToken == '+') {
             match('+');
             digit();
             System.out.println("add");
             oper();
-        } else if (peek() == '-') {
+        } else if (currentToken == '-') {
             match('-');
             digit();
             System.out.println("sub");
             oper();
-        } else if (peek() == 0) {
+        } else if (currentToken == 0) {
             // vazio
         } else {
             throw new Error("syntax error");
@@ -108,8 +108,8 @@ class Scanner {
 
 
 public class Tradutor {
-    public static void main(String[] args) throws Exception {
-        String input = "42+20";
+    public static void main(String[] args) {
+        String input = "8+5-7+9";
         Parser p = new Parser (input.getBytes());
         p.parse();
 
