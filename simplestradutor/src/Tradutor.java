@@ -13,38 +13,59 @@ class Scanner {
     private char peek () {
         if (current < input.length)
            return (char)input[current];
-       return 0;
+       return '\0';
+    }
+
+    private void advance()  {
+        char ch = peek();
+        if (ch != '\0') {
+            current++;
+        }
+    }
+
+    private String number() {
+        int start = current ;
+        while (Character.isDigit(peek())) {
+            advance();
+        }
+        
+        String n = new String(input, start, current-start)  ;
+        return n;
     }
 
 
-    public char nextToken () {
+    public String nextToken () {
         char ch = peek();
-
-        if (Character.isDigit(ch)) {
-            current++;
-            return ch;
-        }
+        if (ch == '0') {
+            advance();
+            return Character.toString(ch);
+        }  else if (Character.isDigit(ch))
+            return number();
+            
+        else if (Character.isDigit(ch))
+            return number();
+        
 
         switch (ch) {
             case '+':
             case '-':
-                current++;
-                return ch;
+                advance();
+                return Character.toString(ch);
             default:
                 break;
         }
 
-        return 0;
+        throw new Error("lexical error");
     }
 
     
 
 }
-
+/* 
  class Parser {
     
     private Scanner scan;
-    private char currentToken;
+    private String currentToken;
 
     public Parser(byte[] input) {
         scan = new Scanner(input);
@@ -95,7 +116,7 @@ class Scanner {
             digit();
             System.out.println("sub");
             oper();
-        } else if (currentToken == 0) {
+        } else if (currentToken == '\0') {
             // vazio
         } else {
             throw new Error("syntax error");
@@ -103,15 +124,24 @@ class Scanner {
     }
 
 }
-
+ */
 
 
 
 public class Tradutor {
     public static void main(String[] args) {
-        String input = "8+5-7+9";
-        Parser p = new Parser (input.getBytes());
-        p.parse();
+        //String input = "8+5-7+9";
+       // Parser p = new Parser (input.getBytes());
+        //p.parse();
 
+        String input = "289-85+0+69";
+        Scanner scan = new Scanner (input.getBytes());
+        System.out.println(scan.nextToken());
+        System.out.println(scan.nextToken());
+        System.out.println(scan.nextToken());
+        System.out.println(scan.nextToken());
+        System.out.println(scan.nextToken());
+        System.out.println(scan.nextToken());
+        System.out.println(scan.nextToken());
     }
 }
