@@ -133,21 +133,33 @@ private boolean isAlphaNumeric(char c) {
 
 
     void expr() {
-        number();
+        term ();
         oper();
     }
 
- 
+    void term () {
+        if (currentToken.type == TokenType.NUMBER)
+            number();
+        else if (currentToken.type == TokenType.IDENT)
+            identifier ();
+        else
+            throw new Error("syntax error");
+    }
+
+    void identifier () {
+        System.out.println("push " + currentToken.lexeme);
+        match(TokenType.IDENT);
+    }
 
     void oper () {
         if (currentToken.type == TokenType.PLUS) {
             match(TokenType.PLUS);
-            number();
+            term();
             System.out.println("add");
             oper();
         } else if (currentToken.type == TokenType.MINUS) {
             match(TokenType.MINUS);
-            number();
+            term();
             System.out.println("sub");
             oper();
         } else if (currentToken.type == TokenType.EOF) {
@@ -165,7 +177,7 @@ private boolean isAlphaNumeric(char c) {
 public class Tradutor {
     public static void main(String[] args) {
         
-        String input = "45  + preco - 876";
+        String input = "45  + + - 876";
         Parser p = new Parser (input.getBytes());
         p.parse();
 
