@@ -177,7 +177,7 @@ private boolean isAlphaNumeric(char c) {
 public class Tradutor {
     public static void main(String[] args) {
         
-        String input = "45  + + - 876";
+        String input = "let a = 42 + 5;";
         Parser p = new Parser (input.getBytes());
         p.parse();
 
