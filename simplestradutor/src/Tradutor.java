@@ -124,6 +124,7 @@ private boolean isAlphaNumeric(char c) {
     
     private Scanner scan;
     private Token currentToken;
+    private StringBuilder code = new StringBuilder();
 
     public Parser(byte[] input) {
         scan = new Scanner(input);
@@ -149,7 +150,7 @@ private boolean isAlphaNumeric(char c) {
     }
 
     void number () {
-        System.out.println("push " + currentToken.lexeme);
+        code.append(String.format("%s\n", "push " + currentToken.lexeme));
         match(TokenType.NUMBER);
     }
 
@@ -165,14 +166,14 @@ private boolean isAlphaNumeric(char c) {
         match(TokenType.IDENT);
         match(TokenType.EQ);
         expr();
-        System.out.println("pop "+id);
+        code.append(String.format("%s\n", "pop "+id));
         match(TokenType.SEMICOLON);
     }
 
     void printStatement () {
         match(TokenType.PRINT);
         expr();
-        System.out.println("print");
+        code.append(String.format("%s\n", "print"));
         match(TokenType.SEMICOLON);
     }
 
@@ -197,7 +198,7 @@ private boolean isAlphaNumeric(char c) {
         if (currentToken.type == TokenType.NUMBER)
             number();
         else if (currentToken.type == TokenType.IDENT) {
-            System.out.println("push "+currentToken.lexeme);
+            code.append(String.format("%s\n", "push "+currentToken.lexeme));
             match(TokenType.IDENT);
         }
         else
@@ -209,14 +210,18 @@ private boolean isAlphaNumeric(char c) {
         if (currentToken.type == TokenType.PLUS) {
             match(TokenType.PLUS);
             term();
-            System.out.println("add");
+            code.append(String.format("%s\n", "add"));
             oper();
         } else if (currentToken.type == TokenType.MINUS) {
             match(TokenType.MINUS);
             term();
-            System.out.println("sub");
+            code.append(String.format("%s\n", "sub"));
             oper();
         } 
+    }
+
+    public String output () {
+        return code.toString();
     }
 
 }
@@ -235,7 +240,7 @@ public class Tradutor {
         
         Parser p = new Parser (input.getBytes());
         p.parse();
-
+        System.out.println(p.output());
    
     }
 }

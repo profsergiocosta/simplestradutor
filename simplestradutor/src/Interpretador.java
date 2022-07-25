@@ -8,8 +8,6 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 
-import java.util.ArrayList;
-import java.util.List;
 
  class Command {
 
@@ -46,8 +44,8 @@ import java.util.List;
 public class Interpretador {
 
     List<String[]> commands;
-    static Stack<Integer> stack = new Stack<>();
-    static Map<String,Integer> variables = new HashMap<>();
+    Stack<Integer> stack = new Stack<>();
+    Map<String,Integer> variables = new HashMap<>();
 
     Interpretador (String input) {
         final String eol = System.getProperty("line.separator");
@@ -68,25 +66,9 @@ public class Interpretador {
         return new Command(commands.remove(0));
     }
 
-
-
-    public static void main(String[] args) {
-        
-        String input = """
-                push 10
-                push 20
-                add
-                pop a
-                push 45
-                push a
-                sub
-                print    
-                """;
-        
-        Interpretador i = new Interpretador (input);
-        
-        while (i.hasMoreCommands()) {
-            var command = i.nextCommand();
+    public void run () {
+        while (hasMoreCommands()) {
+            var command = nextCommand();
             switch (command.type) {
                 case ADD:
                     var arg2 = stack.pop();
@@ -117,9 +99,39 @@ public class Interpretador {
                 
 
             }
-            
         }
+    }
 
+
+
+    public static void main(String[] args) {
+        
+        /* 
+        String input = """
+                push 10
+                push 20
+                add
+                pop a
+                push 45
+                push a
+                sub
+                print    
+                """;
+        */
+
+        String input = """
+            let a = 42 + 2;
+            let b = 15 + 3;
+            print a + b;        
+                """;
+        
+        Parser p = new Parser (input.getBytes());
+        p.parse();
+
+
+        Interpretador i = new Interpretador (p.output());
+        i.run();
+        
    
     }
     
