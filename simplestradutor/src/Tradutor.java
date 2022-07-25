@@ -11,6 +11,7 @@ class Scanner {
     static {
         keywords = new HashMap<>();
         keywords.put("let",    TokenType.LET);
+        keywords.put("print",    TokenType.PRINT);
     }
 
     public Scanner (byte[] input) {
@@ -135,8 +136,7 @@ private boolean isAlphaNumeric(char c) {
 
 
     public void parse () {
-        //expr();
-        letStatement();
+        statements();
     }
  
 
@@ -161,10 +161,36 @@ private boolean isAlphaNumeric(char c) {
 
     void letStatement () {
         match(TokenType.LET);
+        var id = currentToken.lexeme;
         match(TokenType.IDENT);
         match(TokenType.EQ);
         expr();
+        System.out.println("pop "+id);
         match(TokenType.SEMICOLON);
+    }
+
+    void printStatement () {
+        match(TokenType.PRINT);
+        expr();
+        System.out.println("print");
+        match(TokenType.SEMICOLON);
+    }
+
+    void statements () {
+        
+        while (currentToken.type != TokenType.EOF) {
+            statement();
+        }
+    }
+
+    void statement () {
+        if (currentToken.type == TokenType.PRINT) {
+            printStatement();
+        } else if (currentToken.type == TokenType.LET) {
+            letStatement();
+        } else {
+            throw new Error("syntax error");
+        }
     }
 
     void term () {
@@ -201,13 +227,12 @@ private boolean isAlphaNumeric(char c) {
 public class Tradutor {
     public static void main(String[] args) {
         
-        String input = "let a = 42 + 5 ;";
-/*
-        Scanner scan = new Scanner (input.getBytes());
-        for (Token tk = scan.nextToken(); tk.type != TokenType.EOF; tk = scan.nextToken()) {
-            System.out.println(tk);
-        }
- */
+        String input = """
+            let a = 42 + 5 - 8;
+            let b = 56 + 8;
+            print a + b + 6;        
+                """;
+        
         Parser p = new Parser (input.getBytes());
         p.parse();
 

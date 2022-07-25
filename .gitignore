@@ -1,3 +1,8 @@
-simplestradutor/bin/Tradutor.class
-simplestradutor/bin/Tradutor.class
+bin
+bin/*.class
+
 simplestradutor.zip
+simplestradutor/bin/
+simplestradutor/bin/Scanner.class
+simplestradutor/bin/TokenType.class
+
