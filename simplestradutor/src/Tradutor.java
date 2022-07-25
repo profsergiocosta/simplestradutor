@@ -1,13 +1,23 @@
+import java.util.HashMap;
+import java.util.Map;
 
 class Scanner {
 
     private byte[] input;
     private int current; 
 
+    private static final Map<String, TokenType> keywords;
+ 
+    static {
+        keywords = new HashMap<>();
+        keywords.put("let",    TokenType.LET);
+    }
 
     public Scanner (byte[] input) {
         this.input = input;
     }
+
+    
 
     private void skipWhitespace() {
         char ch = peek();
@@ -56,7 +66,9 @@ private boolean isAlphaNumeric(char c) {
         while (isAlphaNumeric(peek())) advance();
     
         String id = new String(input, start, current-start)  ;
-        return new Token(TokenType.IDENT, id);
+        TokenType type = keywords.get(id);
+        if (type == null) type = TokenType.IDENT;
+        return new Token(type, id);
     }
 
 
@@ -87,6 +99,15 @@ private boolean isAlphaNumeric(char c) {
                 case '-':
                     advance();
                     return new Token (TokenType.MINUS,"-");
+
+                case '=':
+                    advance();
+                    return new Token (TokenType.EQ,"=");
+
+                case ';':
+                    advance();
+                    return new Token (TokenType.SEMICOLON,";");
+
                 case '\0':
                     return new Token (TokenType.EOF,"EOF");
                 default:
@@ -114,7 +135,8 @@ private boolean isAlphaNumeric(char c) {
 
 
     public void parse () {
-        expr();
+        //expr();
+        letStatement();
     }
  
 
@@ -122,7 +144,7 @@ private boolean isAlphaNumeric(char c) {
         if (currentToken.type == t) {
             nextToken();
         }else {
-            throw new Error("syntax error");
+            throw new Error("Syntax error at "+currentToken);
         }
     }
 
@@ -137,19 +159,25 @@ private boolean isAlphaNumeric(char c) {
         oper();
     }
 
+    void letStatement () {
+        match(TokenType.LET);
+        match(TokenType.IDENT);
+        match(TokenType.EQ);
+        expr();
+        match(TokenType.SEMICOLON);
+    }
+
     void term () {
         if (currentToken.type == TokenType.NUMBER)
             number();
-        else if (currentToken.type == TokenType.IDENT)
-            identifier ();
+        else if (currentToken.type == TokenType.IDENT) {
+            System.out.println("push "+currentToken.lexeme);
+            match(TokenType.IDENT);
+        }
         else
             throw new Error("syntax error");
     }
 
-    void identifier () {
-        System.out.println("push " + currentToken.lexeme);
-        match(TokenType.IDENT);
-    }
 
     void oper () {
         if (currentToken.type == TokenType.PLUS) {
@@ -162,11 +190,7 @@ private boolean isAlphaNumeric(char c) {
             term();
             System.out.println("sub");
             oper();
-        } else if (currentToken.type == TokenType.EOF) {
-            // vazio
-        } else {
-            throw new Error("syntax error");
-        }
+        } 
     }
 
 }
@@ -177,7 +201,13 @@ private boolean isAlphaNumeric(char c) {
 public class Tradutor {
     public static void main(String[] args) {
         
-        String input = "let a = 42 + 5;";
+        String input = "let a = 42 + 5 ;";
+/*
+        Scanner scan = new Scanner (input.getBytes());
+        for (Token tk = scan.nextToken(); tk.type != TokenType.EOF; tk = scan.nextToken()) {
+            System.out.println(tk);
+        }
+ */
         Parser p = new Parser (input.getBytes());
         p.parse();
 
